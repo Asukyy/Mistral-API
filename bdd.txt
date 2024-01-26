@@ -1,0 +1,22 @@
+Table container_mess:
+
+container_id (Clé primaire) - Identifiant unique du conteneur de messages.
+name - Le nom ou la description du conteneur.
+date_created - La date et l'heure à laquelle le conteneur a été créé.
+
+Table messages:
+
+message_id (Clé primaire) - Identifiant unique du message.
+container_id (Clé étrangère vers container_mess) - Référence au conteneur de messages auquel appartient ce message.
+user_id (Clé étrangère vers users) - Référence à l'utilisateur qui a créé le message.
+content - Le contenu du message.
+timestamp - La date et l'heure à laquelle le message a été créé.
+D'autres colonnes peuvent être ajoutées en fonction des besoins, telles que les pièces jointes, les réponses, etc.
+
+Table users:
+
+user_id (Clé primaire) - Identifiant unique de l'utilisateur.
+username - Le nom d'utilisateur de l'utilisateur.
+email - L'adresse e-mail de l'utilisateur.
+password - Le mot de passe de l'utilisateur (il doit être stocké de manière sécurisée en utilisant des techniques de hachage).
+D'autres informations d'utilisateur telles que le nom, le prénom, etc.
