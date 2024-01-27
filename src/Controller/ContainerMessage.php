@@ -12,11 +12,18 @@ use App\Entity\Messages;
 use App\Entity\containerMess;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 
 class ContainerMessage extends AbstractController {
 
-//   return vers lindex
+    private $client;
+
+    public function __construct(HttpClientInterface $client)
+    {
+        $this->client = $client;
+    }
+
     #[Route('/container', name: 'container')]
     public function index(Request $request, EntityManagerInterface $entityManager): Response {
        $container = new ContainerMess();
@@ -114,12 +121,10 @@ class ContainerMessage extends AbstractController {
 
     #[Route('/envoyer-message', name: 'envoyer_message')]
     public function envoyerMessage(Request $request, EntityManagerInterface $entityManager): Response {
-        // error_log("Request Method: " . $request->getMethod());
-        // error_log("Is AJAX: " . $request->isXmlHttpRequest());
-        // error_log("Message: " . $request->request->get('message'));
-        // error_log("Container ID: " . $request->request->get('container_id'));
+
+        try {
+
         if ($request->isMethod('POST') && $request->isXmlHttpRequest()) {
-            error_log("Method POST and AJAX");
             $messageContent = $request->request->get('message');
             $containerId = $request->request->get('container_id');
 
@@ -137,28 +142,62 @@ class ContainerMessage extends AbstractController {
                 return $this->json(['status' => 'error', 'message' => 'Message vide'], Response::HTTP_BAD_REQUEST);
             }
 
-            $message = new Messages();
-            $message->setContent($messageContent);
-            $message->setTimestamp(new \DateTime());
-            $message->setContainer($container); // Associer le message au container spécifié
-            $message->setUser($user);
+            // Enregistrer le message de l'utilisateur
+            $userMessage = $this->createMessage($messageContent, $user, $container, $entityManager);
 
-            $entityManager->persist($message);
-            $entityManager->flush();
+            // Appeler l'API Mistral pour obtenir une réponse
+            $responseIA = $this->appelerIA($messageContent, $entityManager, $container);
 
             return $this->json([
                 'status' => 'success',
-                'messageContent' => $message->getContent(),
-                'timestamp' => $message->getTimestamp()->format('Y-m-d H:i'),
+                'userMessageContent' => $userMessage->getContent(),
+                'iaMessageContent' => $responseIA['content'],
+                'timestamp' => $userMessage->getTimestamp()->format('Y-m-d H:i'),
             ]);
         }
-
-        return $this->json(['status' => 'error', 'message' => 'Request invalide'], Response::HTTP_BAD_REQUEST);
+    } catch (\Exception $e) {
+        error_log('Erreur lors de l\'envoi du message : ' . $e->getMessage());
+        return $this->json(['status' => 'error', 'message' => 'Erreur interne du serveur'], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 
+        return $this->json(['status' => 'error', 'message' => 'Requête invalide'], Response::HTTP_BAD_REQUEST);
+    }
 
+    private function createMessage($content, $user, $container, $entityManager) {
+        $message = new Messages();
+        $message->setContent($content);
+        $message->setTimestamp(new \DateTime());
+        $message->setContainer($container);
+        $message->setUser($user);
+        $entityManager->persist($message);
+        $entityManager->flush();
+        return $message;
+    }
 
+    private function appelerIA($messageContent, $entityManager, $container) {
+        $response = $this->client->request('POST', 'https://api.mistral.ai/v1/chat/completions', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ],
+            'json' => [
+                'model' => 'mistral-tiny',
+                'messages' => [
+                    ["role" => "user", "content" => $messageContent]
+                ],
+            ],
+        ]);
 
+        $data = $response->toArray();
+
+        // Créer un message pour la réponse de l'IA
+        $messageIA = $this->createMessage($data['responses'][0]['content'], null, $container, $entityManager);
+
+        return [
+            'content' => $data['responses'][0]['content']
+        ];
+    }
 }
 
 ?>
