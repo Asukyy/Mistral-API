@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>Mistral API</title>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    {# <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" /> #}
+    {% block stylesheets %}
+    <link href="/css/styles.css" rel="stylesheet" />
+    {% endblock %}
+</head>
+{% block body %}
+{% include 'partials/_navbar.html.twig' %}
+<div class="container">
+    {% block content %}
+
+<div class="form-add-container">
+    <form action="{{ path('add_container') }}" method="post">
+        <input type="text" name="name" placeholder="Nom du container">
+    </form>
+</div>
+
+<div class="container_containers">
+{% for container in containers %}
+<div class="container_container">
+    <span class="container-name">{{ container.name }}</span>
+
+    <div class="edit-form" id="edit-form-{{ container.id }}" style="display: none;">
+        <form action="{{ path('edit_container', {'id': container.id}) }}" method="post">
+            <input type="text" name="newName" value="{{ container.name }}">
+            <button type="submit">Enregistrer</button>
+        </form>
+        <button onclick="toggleEditForm({{ container.id }})">Annuler</button>
+    </div>
+
+    <a href="#" onclick="toggleEditForm({{ container.id }}); return false;">Modifier</a>
+    <a href="{{ path('delete_container', {'id': container.id}) }}">Supprimer</a>
+    <a href="{{ path('view_container', {'id': container.id}) }}">Voir les messages</a>
+</div>
+{% endfor %}
+</div>
+
+
+
+    {% endblock %}
+    </div>
+<script>
+        function toggleEditForm(containerId) {
+            var form = document.getElementById('edit-form-' + containerId);
+            var nameDisplay = document.querySelector('.container-name');
+
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+                nameDisplay.style.display = 'none';
+            } else {
+                form.style.display = 'none';
+                nameDisplay.style.display = 'block';
+            }
+        }
+</script>
+
+    {% endblock %}
+</body>
+</html>
+

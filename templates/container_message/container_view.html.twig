@@ -16,13 +16,10 @@
 {% include 'partials/_navbar.html.twig' %}
 
 <div class="messages-container">
-{% for container in containers %}
     <div class="container">
-        <a href="{{ path('view_container', {'id': container.id}) }}">
-            {{ container.name }}
-        </a>
+        <h2>{{ container.name }}</h2> <!-- Titre du container -->
         <div class="messages">
-            {% for message in container.messages %}
+            {% for message in messages %}
                 <div class="message">
                     <p>{{ message.content }}</p>
                     <span>{{ message.timestamp|date('Y-m-d H:i') }}</span>
@@ -32,24 +29,25 @@
             {% endfor %}
         </div>
     </div>
-{% else %}
-    <p>Aucun container à afficher.</p>
-{% endfor %}
 </div>
 
 <div class="chat-interface">
-{# crée un bouton pour acceder aux containers#}
-    <a href="{{ path('container') }}" class="btn btn-primary">Containers</a>
+    <a href="{{ path('container') }}" class="btn btn-primary">Retour aux containers</a>
     <form action="{{ path('envoyer_message') }}" method="post">
-        <input type="text" name="message" class="chat-input" placeholder="Tapez votre message ici..." />
+    <input type="hidden" name="container_id" value="{{ container.id }}" />
+    <input type="text" name="message" class="chat-input" placeholder="Tapez votre message ici..." />
     </form>
 </div>
-{# {% include 'partials/_footer.html.twig' %} #}
 <script>
 document.querySelector('.chat-interface form').addEventListener('submit', function(e) {
     e.preventDefault();
 
     var messageContent = document.querySelector('.chat-interface input[name="message"]').value;
+    var containerId = document.querySelector('input[name="container_id"]').value; // Assurez-vous que cet élément existe et a la bonne valeur
+
+    var formData = new URLSearchParams();
+    formData.append('message', messageContent);
+    formData.append('container_id', containerId);
 
     fetch('{{ path("envoyer_message") }}', {
         method: 'POST',
@@ -57,19 +55,17 @@ document.querySelector('.chat-interface form').addEventListener('submit', functi
             'X-Requested-With': 'XMLHttpRequest',
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: 'message=' + encodeURIComponent(messageContent)
+        body: formData
     })
     .then(response => response.json())
     .then(data => {
         if(data.status === 'success') {
-            // Créer et ajouter le nouveau message au DOM
             var messagesContainer = document.querySelector('.messages-container');
             var newMessage = document.createElement('div');
             newMessage.classList.add('message');
             newMessage.innerHTML = `<p>${data.messageContent}</p><span>${data.timestamp}</span>`;
             messagesContainer.appendChild(newMessage);
 
-            // Effacer le champ de saisie
             document.querySelector('.chat-interface input[name="message"]').value = '';
         } else {
             // Gérer l'erreur

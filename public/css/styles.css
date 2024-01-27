@@ -1,4 +1,3 @@
-/* BASE */
 
 *{
     margin: 0;
@@ -6,25 +5,217 @@
     box-sizing: border-box;
 }
 
-body{
-    background-color: #f5f5f5;
-    font-family: 'Roboto', sans-serif;
-    font-size: 16px;
-    color: #333;
+body {
+    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #f0f0f0; /* Fond sombre */
+    color: #fff; /* Texte blanc */
 }
 
 /* HEADER */
 
-nav{
-    background-color: #504646;
-    padding: 20px 0;
-    border-bottom: 1px solid #ccc;
-    box-shadow: 0 0 10px #ccc;
-    color : #fff;
+.navbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    background-color: #ffffff;
+}
+
+.navbar-title {
+    font-size: 2.9rem;
+    font-weight: 800;
+    color: transparent;
+    background: linear-gradient(60deg, #ec0d78, #ff2b40, #f75735, #fe880e);
+    background-clip: text;
+    -webkit-background-clip: text;
+    /* text-transform: uppercase; */
 }
 
 /* CONTENT */
+
+.messages-container {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #f0f0f0; /* Fond gris clair */
+}
+
+.message {
+    max-width: 60%;
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 10px;
+    color: #333;
+    background-color: #165fbe; /* Vert clair */
+}
+
+/* Messages alternés : un sur deux sur le côté droit */
+.message:nth-child(even) {
+    margin-left: auto;
+    background-color: #5c8fb8; /* Vert Bootstrap */
+}
+
+/* Messages alternés : un sur deux sur le côté gauche */
+.message:nth-child(odd) {
+    margin-right: auto;
+    background-color: #165fbe;
+}
+
+.message p {
+    margin: 0;
+}
+
+.message span {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.8em;
+    color: #f0f0f0; /* Texte légèrement plus clair */
+}
+
+/* Interface de chat */
+.chat-interface {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    padding: 25px;
+    background-color: #f0f0f0;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    margin: 0 auto;
+}
+
+.chat-interface a{
+    text-decoration: none;
+    color: #333;
+    background-color: #e0dbdb;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 15px;
+    font-size: 1em;
+    margin-right: 10px;
+}
+
+.chat-interface a:hover{
+    background-color: #165fbe;
+    color: #fff;
+    border: 2px solid #165fbe;
+}
+
+.chat-input {
+    flex-grow: 1;
+    padding: 12px;
+    border: 2px solid #ccc;
+    border-radius: 35px;
+    margin-right: 10px;
+    color: #333;
+    background-color: #f0f0f0;
+    font-size: 1em;
+    width: 27rem;
+    height: 3.5rem;
+}
+
+.chat-input:focus {
+    outline: none;
+}
+
+.form-add-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.form-add-container form input{
+    width: 100%;
+    height: 3.5rem;
+    border: 2px solid #ccc;
+    border-radius: 35px;
+    padding: 12px;
+    font-size: 1em;
+    color: #333;
+    background-color: #f0f0f0;
+}
+
+.form-add-container form input:focus {
+    outline: none;
+}
+
+.container_containers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container_container {
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    width: 300px;
+    text-align: center;
+    transition: transform 0.3s ease-in-out;
+    position: relative;
+    color:#333;
+}
+
+.container_container h2 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.container_container .container-actions {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.container_container a {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #007bff;
+    border: 2px solid #007bff;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.container_container a:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.container_container a.delete {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.container_container a.delete:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+.container_container a.edit {
+    border-color: #ffc107;
+    color: #ffc107;
+}
+
+.container_container a.edit:hover {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+
 
 /* FOOTER */

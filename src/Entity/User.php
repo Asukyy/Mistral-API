@@ -31,15 +31,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $username = null;
-
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Messages::class)]
     private Collection $messages;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $username = null;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Containermess::class)]
+    private Collection $containermesses;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: ContainerMess::class)]
+    private Collection $containerMesses;
 
     public function __construct()
     {
         $this->messages = new ArrayCollection();
+        $this->containermesses = new ArrayCollection();
+        $this->containerMesses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -112,18 +120,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    public function getUsername(): ?string
-    {
-        return $this->username;
-    }
-
-    public function setUsername(string $username): static
-    {
-        $this->username = $username;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Messages>
      */
@@ -148,6 +144,48 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($message->getUser() === $this) {
                 $message->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getUsername(): ?string
+    {
+        return $this->username;
+    }
+
+    public function setUsername(?string $username): static
+    {
+        $this->username = $username;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Containermess>
+     */
+    public function getContainermesses(): Collection
+    {
+        return $this->containermesses;
+    }
+
+    public function addContainermess(Containermess $containermess): static
+    {
+        if (!$this->containermesses->contains($containermess)) {
+            $this->containermesses->add($containermess);
+            $containermess->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeContainermess(Containermess $containermess): static
+    {
+        if ($this->containermesses->removeElement($containermess)) {
+            // set the owning side to null (unless already changed)
+            if ($containermess->getUser() === $this) {
+                $containermess->setUser(null);
             }
         }
 

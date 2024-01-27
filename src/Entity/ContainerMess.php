@@ -22,8 +22,12 @@ class ContainerMess
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $date_created = null;
 
-    #[ORM\OneToMany(mappedBy: 'container', targetEntity: Messages::class)]
+    #[ORM\OneToMany(mappedBy: 'container', targetEntity: Messages::class, cascade: ['remove'])]
     private Collection $messages;
+
+    #[ORM\ManyToOne(inversedBy: 'containerMesses')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
 
     public function __construct()
     {
@@ -85,6 +89,18 @@ class ContainerMess
                 $message->setContainer(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }
