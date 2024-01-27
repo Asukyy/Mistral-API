@@ -17,16 +17,16 @@
 
 <div class="messages-container">
     <div class="container">
-        <h2>{{ container.name }}</h2> <!-- Titre du container -->
+        <h2 class="container_name">{{ container.name }}</h2> <!-- Titre du container -->
         <div class="messages">
-            {% for message in messages %}
+          {% for message in messages %}
                 <div class="message">
-                    <p>{{ message.content }}</p>
-                    <span>{{ message.timestamp|date('Y-m-d H:i') }}</span>
+                    <p>{{ message.content|nl2br }}</p>
+                    <span>{{ message.timestamp|date('Y-m-d') }}</span>
                 </div>
             {% else %}
                 <p>Aucun message dans ce container.</p>
-            {% endfor %}
+        {% endfor %}
         </div>
     </div>
 </div>
@@ -34,16 +34,17 @@
 <div class="chat-interface">
     <a href="{{ path('container') }}" class="btn btn-primary">Retour aux containers</a>
     <form action="{{ path('envoyer_message') }}" method="post">
-    <input type="hidden" name="container_id" value="{{ container.id }}" />
-    <input type="text" name="message" class="chat-input" placeholder="Tapez votre message ici..." />
+        <input type="hidden" name="container_id" value="{{ container.id }}" />
+        <textarea name="message" class="chat-input" placeholder="Tapez votre message ici..."></textarea>
     </form>
 </div>
+
 <script>
 document.querySelector('.chat-interface form').addEventListener('submit', function(e) {
     e.preventDefault();
 
-    var messageContent = document.querySelector('.chat-interface input[name="message"]').value;
-    var containerId = document.querySelector('input[name="container_id"]').value; // Assurez-vous que cet élément existe et a la bonne valeur
+    var messageContent = document.querySelector('.chat-interface textarea[name="message"]').value;
+    var containerId = document.querySelector('input[name="container_id"]').value;
 
     var formData = new URLSearchParams();
     formData.append('message', messageContent);
@@ -59,20 +60,32 @@ document.querySelector('.chat-interface form').addEventListener('submit', functi
     })
     .then(response => response.json())
     .then(data => {
-        if(data.status === 'success') {
-            var messagesContainer = document.querySelector('.messages-container');
-            var newMessage = document.createElement('div');
-            newMessage.classList.add('message');
-            newMessage.innerHTML = `<p>${data.messageContent}</p><span>${data.timestamp}</span>`;
-            messagesContainer.appendChild(newMessage);
+    if(data.status === 'success') {
+        var messagesContainer = document.querySelector('.messages-container');
+        var newMessage = document.createElement('div');
+        newMessage.classList.add('message');
 
-            document.querySelector('.chat-interface input[name="message"]').value = '';
-        } else {
-            // Gérer l'erreur
-            console.error('Erreur : ', data.message);
-        }
-    });
+        var formattedContent = data.messageContent.replace(/\n/g, '<br>');
+
+        newMessage.innerHTML = `<p>${formattedContent}</p><span>${data.timestamp}</span>`;
+        messagesContainer.appendChild(newMessage);
+
+        document.querySelector('.chat-interface textarea[name="message"]').value = '';
+    } else {
+        console.error('Erreur : ', data.message);
+    }
 });
+
+});
+
+document.querySelector('.chat-interface textarea[name="message"]').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        var event = new Event('submit', { 'bubbles': true, 'cancelable': true });
+        this.form.dispatchEvent(event); // Déclenche l'événement submit sur le formulaire
+    }
+});
+
 
 </script>
 

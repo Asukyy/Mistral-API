@@ -114,7 +114,12 @@ class ContainerMessage extends AbstractController {
 
     #[Route('/envoyer-message', name: 'envoyer_message')]
     public function envoyerMessage(Request $request, EntityManagerInterface $entityManager): Response {
+        // error_log("Request Method: " . $request->getMethod());
+        // error_log("Is AJAX: " . $request->isXmlHttpRequest());
+        // error_log("Message: " . $request->request->get('message'));
+        // error_log("Container ID: " . $request->request->get('container_id'));
         if ($request->isMethod('POST') && $request->isXmlHttpRequest()) {
+            error_log("Method POST and AJAX");
             $messageContent = $request->request->get('message');
             $containerId = $request->request->get('container_id');
 
@@ -148,7 +153,7 @@ class ContainerMessage extends AbstractController {
             ]);
         }
 
-        return $this->json(['status' => 'error', 'message' => 'Requête invalide'], Response::HTTP_BAD_REQUEST);
+        return $this->json(['status' => 'error', 'message' => 'Request invalide'], Response::HTTP_BAD_REQUEST);
     }
 
 
